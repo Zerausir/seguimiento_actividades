@@ -11,20 +11,47 @@ env.read_env()
 
 
 def get_indicator_path(indicator, year):
-    """Retorna la ruta correspondiente al indicador y año"""
+    """
+    Obtiene la ruta específica de un indicador dado un año.
+
+    Parameters:
+    - indicator (str): Identificador corto del indicador.
+    - year (int): Año asociado al indicador.
+
+    Returns:
+    - str: Ruta correspondiente al indicador y año, o None si no está configurada.
+    """
     indicator_var = f"RUTA_{indicator}_{year}"
     return env.str(indicator_var, None)
 
 
 def get_monthly_indicator_path(indicator, month, year):
-    """Retorna la ruta mensual para indicadores que la tienen"""
+    """
+    Obtiene la ruta mensual para un indicador específico.
+
+    Parameters:
+    - indicator (str): Identificador corto del indicador.
+    - month (str): Abreviatura del mes (e.g., 'ENE').
+    - year (int): Año asociado al indicador.
+
+    Returns:
+    - str: Ruta mensual del indicador, o None si no está configurada.
+    """
     indicator_var = f"RUTA_{indicator}_{month}_{year}"
     return env.str(indicator_var, None)
 
 
 def check_file_exists(informe_num, indicator, year):
     """
-    Verifica si el archivo existe en las rutas correspondientes
+    Verifica si un archivo existe en las rutas configuradas para un indicador y año.
+
+    Parameters:
+    - informe_num (str/int): Número de informe a buscar.
+    - indicator (str): Identificador corto del indicador.
+    - year (int): Año asociado al indicador.
+
+    Returns:
+    - bool: True si el archivo existe, False de lo contrario.
     """
     if not informe_num:
         return False
@@ -60,7 +87,12 @@ def check_file_exists(informe_num, indicator, year):
 
 
 def verify_environment_variables():
-    """Verifica que las variables de entorno necesarias estén disponibles"""
+    """
+    Valida la configuración de las variables de entorno necesarias para ejecutar el script.
+
+    Raises:
+    - EnvironmentError: Si faltan variables de entorno requeridas.
+    """
     required_vars = ['SERVER_ROUTE', 'DOWNLOAD_ROUTE']
     missing_vars = []
 
@@ -75,6 +107,15 @@ def verify_environment_variables():
 
 
 def process_seguimiento(file_path):
+    """
+    Procesa un archivo Excel de seguimiento y aplica reglas específicas para actualizar los datos.
+
+    Parameters:
+    - file_path (str): Ruta del archivo de seguimiento a procesar.
+
+    Outputs:
+    - Crea un archivo Excel actualizado en la ruta definida por la variable DOWNLOAD_ROUTE.
+    """
     # Verificar variables de entorno
     verify_environment_variables()
 
@@ -214,7 +255,7 @@ def process_seguimiento(file_path):
             ws.cell(row=row, column=col_indices['MEMO_DT']).fill = fill_color
             ws.cell(row=row, column=col_indices['FECHA_DT']).fill = fill_color
 
-        # Regla 5: Todo rojo si ATENDIDO es NO y no se cumple ninguna condición
+        # Regla 5: Color rojo si ATENDIDO es NO y no se cumple ninguna condición
         if atendido == 'NO':
             if not informe and not memo_jur and not memo_dt:
                 for col in ['ATENDIDO', 'INFORME', 'FECHA_INF', 'PARA_JURIDICO',
