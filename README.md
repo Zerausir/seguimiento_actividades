@@ -1,120 +1,132 @@
-# PDF Extractor - README
+# Procesador de Seguimiento - README
 
-## Overview
+## Descripción General
 
-This project provides a Python script to process PDF files, extract structured information using regular expressions,
-and export the data to an Excel file with filters and styled formatting.
+Este proyecto proporciona un script en Python para procesar archivos de Excel, actualizando información estructurada y
+aplicando formato condicional y reglas específicas.
 
-## Features
+## Características
 
-- Extracts key information from PDFs, including document name, date, subject, references, and annexes.
-- Processes all PDFs in a specified directory.
-- Exports the extracted data into an Excel file with formatted headers and adjustable column widths.
-- Validates required environment variables for seamless configuration.
+- Procesa datos de seguimiento en un archivo Excel.
+- Actualiza columnas y aplica formato condicional según reglas predefinidas.
+- Valida la existencia de archivos en rutas configuradas mediante variables de entorno.
+- Exporta el archivo actualizado a una ubicación definida con formato ajustado y filtros habilitados.
 
-## Requirements
+## Requisitos
 
-- Python 3.8 or later
-- Dependencies (see `requirements.txt`):
+- Python 3.8 o superior.
+- Dependencias (ver `requirements.txt`):
     - pandas
-    - PyPDF2
     - openpyxl
     - environs
+    - glob
 
-## Installation
+## Instalación
 
-1. Clone the repository.
-2. Create and activate a virtual environment:
+1. Clona el repositorio.
+2. Crea y activa un entorno virtual:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # En Windows: venv\Scripts\activate
    ```
-3. Install dependencies:
+3. Instala las dependencias:
    ```bash
    pip install -r requirements.txt
    ```
 
-## Configuration
+## Configuración
 
-Ensure that the following environment variables are set in a `.env` file in the root directory:
+Asegúrate de que las siguientes variables de entorno estén configuradas en un archivo `.env` en el directorio raíz:
 
 ```env
-SERVER_ROUTE=path/to/pdf/directory
-DOWNLOAD_ROUTE=path/to/save/excel
+SERVER_ROUTE=ruta/a/directorio/de/entrada
+DOWNLOAD_ROUTE=ruta/a/directorio/de/salida
+FILE_SEGUIMIENTO_GPR=nombre_del_archivo.xlsx
+RESULTS=nombre_del_archivo_resultante.xlsx
+RUTA_CRONOLOGICO_2023=ruta/a/cronologico/2023
+RUTA_CRONOLOGICO_2024=ruta/a/cronologico/2024
+RUTA_CRONOLOGICO_2025=ruta/a/cronologico/2025
+RUTA_<INDICADOR>_<AÑO>=ruta_del_indicador_para_año
+RUTA_<INDICADOR>_<MES>_<AÑO>=ruta_mensual_del_indicador
 ```
 
-- `SERVER_ROUTE`: Directory containing the PDF files to process.
-- `DOWNLOAD_ROUTE`: Directory where the output Excel file will be saved.
+- `SERVER_ROUTE`: Directorio que contiene el archivo de seguimiento.
+- `DOWNLOAD_ROUTE`: Directorio donde se guardará el archivo actualizado.
+- `FILE_SEGUIMIENTO_GPR`: Nombre del archivo de seguimiento.
+- `RESULTS`: Nombre del archivo resultante.
 
-## Usage
+## Uso
 
-1. Run the script:
+1. Coloca el archivo de seguimiento en la ruta definida por `SERVER_ROUTE`.
+2. Ejecuta el script:
    ```bash
-   python script_name.py
+   python main.py
    ```
-   Replace `script_name.py` with the name of the script file.
+3. El archivo actualizado será guardado en la ruta definida por `DOWNLOAD_ROUTE` con el nombre configurado en `RESULTS`.
 
-2. The script will process all PDFs in the specified directory and save the extracted data in an Excel file at the
-   output location defined in `DOWNLOAD_ROUTE`.
+## Estructura del Código
 
-## Code Structure
+### Funciones Principales
 
-### `PDFExtractor` Class
+#### `process_seguimiento(file_path)`
 
-Handles PDF processing:
+- Lee y actualiza el archivo Excel según reglas predefinidas.
+- Aplica formato condicional para resaltar valores relevantes.
+- Guarda el archivo procesado en la ubicación definida.
 
-- **`extract_text_from_pdf(pdf_path)`**: Extracts the full text from a PDF file.
-- **`extract_field_with_regex(text, pattern)`**: Extracts a specific field using a regex pattern.
-- **`process_pdf(pdf_path)`**: Extracts all required fields from a single PDF.
-- **`process_directory(directory)`**: Processes all PDFs in a directory and returns a consolidated DataFrame.
+#### `check_file_exists(informe_num, indicator, year)`
 
-### Utility Functions
+- Verifica la existencia de archivos en rutas cronológicas, específicas y mensuales.
 
-- **`save_to_excel_with_style(df, output_file)`**: Exports a DataFrame to an Excel file with styles, filters, and
-  adjustable column widths.
-- **`verify_environment_variables()`**: Validates that all required environment variables are set.
+#### `verify_environment_variables()`
 
-## Error Handling
+- Valida que todas las variables de entorno necesarias estén configuradas.
 
-- Catches exceptions during PDF processing and logs the errors.
-- Validates environment variables and raises an error if any are missing.
+### Utilidades
 
-## Example Output
+- Ajuste automático del ancho de las columnas.
+- Habilitación de filtros y congelación de la primera fila en el archivo Excel resultante.
 
-An Excel file with the following columns:
+## Manejo de Errores
 
-- `Nombre`: Name of the document.
-- `Fecha`: Date extracted from the document.
-- `Asunto`: Subject of the document.
-- `Anexo`: List of annexes.
-- `Referencias`: References mentioned in the document.
+- Captura excepciones durante la verificación de rutas y variables de entorno.
+- Lanza un error detallado si faltan variables de entorno críticas.
 
-## Contributing
+## Ejemplo de Salida
 
-1. Fork the repository.
-2. Create a feature branch:
+Un archivo Excel con las siguientes columnas:
+
+- `ATENDIDO`: Indicador actualizado según las reglas de procesamiento.
+- `ATENDIDO FUENTE`: Copia original de la columna `ATENDIDO`.
+- `INDICADOR AÑO`: Año asociado al indicador.
+- `INDICADOR AÑO ENCONTRADO`: Año validado tras la búsqueda de archivos.
+
+## Contribución
+
+1. Haz un fork del repositorio.
+2. Crea una rama para tu funcionalidad:
    ```bash
-   git checkout -b feature-name
+   git checkout -b nueva-funcionalidad
    ```
-3. Commit your changes:
+3. Realiza tus cambios y realiza un commit:
    ```bash
-   git commit -m "Add new feature"
+   git commit -m "Agrega nueva funcionalidad"
    ```
-4. Push to the branch:
+4. Envía tus cambios:
    ```bash
-   git push origin feature-name
+   git push origin nueva-funcionalidad
    ```
-5. Open a pull request.
+5. Abre un pull request.
 
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Acknowledgments
+## Librerias
 
 - Libraries
-  used: [PyPDF2](https://pypi.org/project/PyPDF2/), [pandas](https://pandas.pydata.org/), [openpyxl](https://openpyxl.readthedocs.io/), [environs](https://pypi.org/project/environs/).
+  used: [pandas](https://pandas.pydata.org/), [openpyxl](https://openpyxl.readthedocs.io/), [environs](https://pypi.org/project/environs/).
 
-## Contact
+## Licencia
 
-For questions or feedback, please contact [Iván Suárez](https://github.com/Zerausir)
+Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+
+## Contacto
+
+Para consultas o comentarios, por favor contacta a [Iván Suárez](https://github.com/Zerausir).
